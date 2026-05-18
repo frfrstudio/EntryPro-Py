@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация нового аккаунта</title>
+    <style>
+        body { background: #0b0f19; color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #111827; padding: 40px; border-radius: 12px; border: 1px solid #1f2937; width: 320px; }
+        h2 { margin-top: 0; font-size: 20px; font-weight: 600; }
+        input, select { width: 100%; padding: 12px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        button:hover { background: #059669; }
+        .link { display: block; text-align: center; margin-top: 15px; color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .flash { color: #ef4444; font-size: 14px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Регистрация</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}
+        {% endwith %}
+        <form method="POST">
+            <input type="text" name="username" placeholder="Логин" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <select name="role">
+                <option value="employee">Сотрудник</option>
+                <option value="admin">Администратор</option>
+            </select>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <a href="/login" class="link">Уже есть аккаунт? Войти</a>
+    </div>
+</body>
+</html>

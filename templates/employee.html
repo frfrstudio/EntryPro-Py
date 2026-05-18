@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <style>
+        body { background: #090d16; color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 40px; }
+        .header { max-width: 800px; margin: 0 auto 30px auto; display: flex; justify-content: space-between; align-items: center; }
+        .box { max-width: 800px; margin: 0 auto; background: #111827; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 30px; text-align: center; }
+        .btn-toggle { padding: 16px 32px; font-size: 16px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; color: #fff; margin: 20px 0; }
+        .start { background: #10b981; } .start:hover { background: #059669; }
+        .stop { background: #ef4444; } .stop:hover { background: #dc2626; }
+        .logout { color: #9ca3af; text-decoration: none; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; text-align: left; }
+        th, td { padding: 12px; border-bottom: 1px solid #1f2937; font-size: 14px; }
+        th { color: #9ca3af; }
+    </style>
+    <script>
+        function handleSession() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => { sendData(position.coords.latitude, position.coords.longitude); },
+                    () => { sendData(null, null); } // Если запретил геопозицию
+                );
+            } else { sendData(null, null); }
+        }
+        async function sendData(lat, lon) {
+            const res = await fetch('/api/session/toggle', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ lat: lat, lon: lon })
+            });
+            if(res.ok) { location.reload(); }
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div>Сотрудник: <b>{{ username }}</b></div>
+        <a href="/logout" class="logout">Выйти</a>
+    </div>
+    <div class="box">
+        {% if not current_session %}
+            <p style="color: #9ca3af;">Рабочая смена закрыта</p>
+            <button class="btn-toggle start" onclick="handleSession()">Открыть смену (Передать локацию)</button>
+        {% else %}
+            <p style="color: #f59e0b;">Смена открыта с {{ current_session.start_time }}</p>
+            <p style="font-size: 13px; color: #9ca3af;">Адрес отметки: {{ current_session.address }}</p>
+            <button class="btn-toggle stop" onclick="handleSession()">Закрыть смену</button>
+        {% endif %}
+
+        {% if history %}
+        <h3 style="text-align: left; margin-top: 40px; font-size: 16px;">Ваша история смен</h3>
+        <table>
+            <thead>
+                <tr><th>Начало</th><th>Конец</th><th>Адрес открытия</th><th>Отработано</th></tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                <tr>
+                    <td>{{ h.start_time }}</td>
+                    <td>{{ h.end_time }}</td>
+                    <td>{{ h.address }}</td>
+                    <td>{{ h.duration // 3600 }}ч {{ (h.duration % 3600) // 60 }}м</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>

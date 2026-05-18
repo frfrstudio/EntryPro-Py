@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления администратора</title>
+    <style>
+        body { background: #090d16; color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 40px; }
+        .header { max-width: 1100px; margin: 0 auto 30px auto; display: flex; justify-content: space-between; align-items: center; }
+        .box { max-width: 1100px; margin: 0 auto; background: #111827; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 30px; }
+        .logout { color: #9ca3af; text-decoration: none; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px; border-bottom: 1px solid #1f2937; font-size: 14px; }
+        th { color: #9ca3af; font-weight: 500; }
+        .active-status { color: #f59e0b; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>Панель администратора: <b>{{ username }}</b></div>
+        <a href="/logout" class="logout">Выйти</a>
+    </div>
+    <div class="box">
+        <h2 style="font-size: 18px; margin-top: 0; margin-bottom: 20px;">Мониторинг всех рабочих смен системы</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Сотрудник</th>
+                    <th>Вход</th>
+                    <th>Выход</th>
+                    <th>Адрес отметки (Яндекс API)</th>
+                    <th>Время работы</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in sessions %}
+                <tr>
+                    <td><b>{{ s.username }}</b></td>
+                    <td>{{ s.start_time }}</td>
+                    <td>
+                        {% if s.end_time %}
+                            {{ s.end_time }}
+                        {% else %}
+                            <span class="active-status">● На смене</span>
+                        {% endif %}
+                    </td>
+                    <td><small style="color: #9ca3af;">{{ s.address }}</small></td>
+                    <td>
+                        {% if s.duration %}
+                            {{ s.duration // 3600 }}ч {{ (s.duration % 3600) // 60 }}м
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not sessions %}
+                <tr><td colspan="5" style="text-align: center; color: #9ca3af; padding: 30px;">Данных о сменах пока нет.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
